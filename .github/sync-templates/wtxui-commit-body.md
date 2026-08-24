@@ -51,4 +51,4 @@ The following files were intentionally excluded from the synchronization:
 A metadata file was generated at:
 
 ```text
-${TARGET_PATH}/.wintwin-sync.json
+${TARGET_PATH}/.wtxui-sync.json

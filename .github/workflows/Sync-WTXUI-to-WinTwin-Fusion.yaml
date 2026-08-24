@@ -20,13 +20,13 @@ name: Sync WinTwin.XUI to WinTwin.Fusion
 #
 # Ausgeschlossen vom Sync:
 #   - .git
-#   - .github
+#   - .gitignore
 #
 # Zusätzlich:
-#   - erzeugt .wintwin-wtxui-sync.json im Zielordner
+#   - erzeugt .wtxui-sync.json im Zielordner
 #   - erzeugt dynamischen Commit-Body aus Template
 #   - listet tatsächlich geänderte Dateien im Commit-Body auf
-#   - pusht nach DUCC-Component-Update
+#   - pusht nach WTXUI-Component-Update
 #   - erstellt oder aktualisiert automatisch einen Pull Request nach main
 #
 # Benötigtes Repository Secret im WinTwin.XUI Repository:
@@ -83,7 +83,7 @@ permissions:
 # =============================================================================
 # Concurrency
 #
-# Verhindert, dass mehrere DUCC-Syncs gleichzeitig dieselbe Zielbranch verändern.
+# Verhindert, dass mehrere USMTC-Syncs gleichzeitig dieselbe Zielbranch verändern.
 # =============================================================================
 
 concurrency:
@@ -168,7 +168,7 @@ jobs:
         with:
           repository: ${{ env.TARGET_REPOSITORY }}
           ref: ${{ env.TARGET_BASE_BRANCH }}
-          token: ${{ secrets.TOKEN_WINTWIN_FUSION_PR_WTXUI }}
+          token: ${{ secrets.WINTWIN_FUSION_COMPONENT_SYNC }}
           path: framework
           fetch-depth: 0
 
@@ -187,14 +187,14 @@ jobs:
       # 5. Zielbranch vorbereiten
       #
       # Strategie:
-      #   Die Branch DUCC-Component-Update wird immer frisch auf Basis von
+      #   Die Branch WTXUI-Component-Update wird immer frisch auf Basis von
       #   origin/main des Framework-Repositories aufgebaut.
       #
       # Vorteil:
       #   Die Branch bleibt eine reine Automations-Branch.
       #
       # Wichtig:
-      #   Manuelle Änderungen auf DUCC-Component-Update sollten vermieden werden,
+      #   Manuelle Änderungen auf WTXUI-Component-Update sollten vermieden werden,
       #   da diese Branch vom Workflow aktualisiert wird.
       # -----------------------------------------------------------------------
 
@@ -229,18 +229,18 @@ jobs:
           mkdir -p "${TARGET_DIRECTORY}"
 
       # -----------------------------------------------------------------------
-      # 7. Dateien aus WinTwin.XUI nach WinTwin.Fusion/Lib/WinTwin.XUI synchronisieren
+      # 7. Dateien aus WinTwin.XUI nach WinTwin.Fusion/WinTwin.XUI synchronisieren
       #
       # Quelle:
       #   ./source/
       #
       # Ziel:
-      #   ./framework/Lib/WinTwin.XUI/
+      #   ./framework/WinTwin.XUI/
       #
       # Ausnahmen:
       #   .git
       #   .gitignore
-      #   wtxui.wm.changelog.md
+      #   ducc.wm.changelog.md
       #
       # Hinweis:
       #   .github wird absichtlich NICHT ausgeschlossen, weil du ausdrücklich
@@ -260,14 +260,14 @@ jobs:
       # 8. Sync-Metadaten-Datei erzeugen
       #
       # Datei:
-      #   ./framework/WinTwin.XUI/.wintwin-sync.json
+      #   ./framework/WinTwin.XUI/.wtxui-sync.json
       #
       # Bedeutung:
       #   Diese Datei landet nach Commit und Push im Zielrepository unter:
       #
       #   WinTwin-Fusion/WinTwin.Fusion
       #   └── WinTwin.XUI
-      #       └── .wintwin-sync.json
+      #       └── .wtxui-sync.json
       #
       # Der Ordner framework/WinTwin.XUI existiert zu diesem Zeitpunkt garantiert,
       # weil er in Schritt 6 per mkdir -p erstellt wurde.
@@ -538,7 +538,7 @@ jobs:
       #
       # Ziel:
       #   WinTwin-Fusion/WinTwin.Fusion
-      #   Branch: DUCC-Component-Update
+      #   Branch: WTXUI-Component-Update
       #
       # Da die Branch bewusst eine Automations-Branch ist, wird sie mit
       # --force-with-lease aktualisiert. Das ist sicherer als --force, weil Git
@@ -556,7 +556,7 @@ jobs:
       #
       # Der Workflow erstellt automatisch einen Pull Request:
       #
-      #   DUCC-Component-Update → main
+      #   WTXUI-Component-Update → main
       #
       # Falls bereits ein offener Pull Request für diese Branch existiert, wird
       # kein zweiter PR erstellt. Stattdessen wird der existierende PR mit dem
@@ -571,7 +571,7 @@ jobs:
         if: steps.changes.outputs.has_changes == 'true'
         working-directory: framework
         env:
-          GH_TOKEN: ${{ secrets.TOKEN_WINTWIN_FUSION_PR_WTXUI }}
+          GH_TOKEN: ${{ secrets.WINTWIN_FUSION_COMPONENT_SYNC }}
         run: |
           PR_TITLE="$(cat .sync_pr_title.txt)"
 
